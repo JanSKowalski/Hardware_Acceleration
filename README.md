@@ -1,6 +1,6 @@
 # Hardware_Acceleration
 
-Xilinx Vitis-HLS allows for quick implementation of Verilog for FPGAs There are two parts to the code: a "host" file that manages data on the computer and a "kernel" that is implemented on an FPGA
+Xilinx Vitis-HLS allows for quick implementation of Verilog for FPGAs. There are two parts to the code: a "host" file that manages data on the computer and a "kernel" that is implemented on an FPGA.
 
 Xilinx has its own V++ compiler that I use, targeting the u200 platform  
   https://www.xilinx.com/products/boards-and-kits/alveo/u200.html#gettingStarted
