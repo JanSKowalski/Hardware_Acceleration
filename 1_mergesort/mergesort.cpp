@@ -21,7 +21,7 @@
 
 #define BUFFER_SIZE 1024
 #define DATA_SIZE 4096
-#define KERNEL_PRECISION 4	//2, 4 or 8
+#define KERNEL_PRECISION 8	//2, 4 or 8
 
 const unsigned int c_len = DATA_SIZE / BUFFER_SIZE;
 const unsigned int c_size = BUFFER_SIZE;
@@ -34,7 +34,6 @@ void compare_2(int, int, unsigned int*, unsigned int*);
 void mergesort(	const unsigned int* input,
          		unsigned int* output,
           		int size        	){
-
 
 
 	unsigned int vin_buffer[BUFFER_SIZE];
@@ -50,6 +49,7 @@ void mergesort(	const unsigned int* input,
 	unsigned int intermediate_e[BUFFER_SIZE];
 //#endif
 
+#pragma HLS DATAFLOW
 
     	for (int i = 0; i < size; i += BUFFER_SIZE) {
 #pragma HLS LOOP_TRIPCOUNT min = c_len max = c_len
@@ -70,6 +70,7 @@ void mergesort(	const unsigned int* input,
 		for(int j=0; j < chunk_size; j+=2){
 	#pragma HLS LOOP_TRIPCOUNT min = c_size max = c_size
 	#pragma HLS PIPELINE II = 1
+	#pragma HLS inline recursive
 			compare_2(j, j+1, vin_buffer, vout_buffer);
 		}
 #endif
@@ -81,6 +82,7 @@ void mergesort(	const unsigned int* input,
 		for(int j=0; j < chunk_size; j+=4){
 	#pragma HLS LOOP_TRIPCOUNT min = c_size max = c_size
 	#pragma HLS PIPELINE II = 1
+	#pragma HLS inline recursive
 			//layer 1
 			compare_2(j, j+1, vin_buffer, intermediate_a);
 			compare_2(j+3, j+2, vin_buffer, intermediate_a);
@@ -95,10 +97,12 @@ void mergesort(	const unsigned int* input,
 
 //Every group of eight inputs is ordered correctly
 #if KERNEL_PRECISION==8
+
 	mergesort_8:
 		for(int j=0; j < chunk_size; j+=8){
 	#pragma HLS LOOP_TRIPCOUNT min = c_size max = c_size
 	#pragma HLS PIPELINE II = 1
+	#pragma HLS inline recursive
 			//layer 1
 			compare_2(j, j+1, vin_buffer, intermediate_a);
 			compare_2(j+3, j+2, vin_buffer, intermediate_a);
