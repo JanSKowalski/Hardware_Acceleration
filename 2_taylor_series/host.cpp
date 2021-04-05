@@ -11,7 +11,7 @@
 #define DATA_SIZE 4096
 #define NUM_WEIGHTS 4
 #define WEIGHT_FILE_PATH "src/weights.data"
-
+#define ERROR_THRESHOLD 0.00001
 
 int main(int argc, char** argv) {
 	if (argc != 2) {
@@ -118,19 +118,23 @@ int main(int argc, char** argv) {
 	std::cout << "Checking taylor series approximation"<< std::endl;;
 
 	bool match = true;
-	double difference;
+	double approx_error, difference;
 	double actual_sin_value;
 	double sum_of_differences = 0;
 	for (int i = 0; i < DATA_SIZE; i++) {
+		//record how well the weights predict sin(x)
 		actual_sin_value = sin(source_values[i]);
-		difference = (source_hw_results[i] > actual_sin_value) ? source_hw_results[i] - actual_sin_value :  actual_sin_value - source_hw_results[i];
-		sum_of_differences += difference;
-		if (source_hw_results[i] != source_sw_results[i]) {
+		approx_error = (source_hw_results[i] > actual_sin_value) ? source_hw_results[i] - actual_sin_value :  actual_sin_value - source_hw_results[i];
+		sum_of_differences += approx_error;
+		
+		//determine if hardware performed correctly		
+		difference = (source_hw_results[i] > source_sw_results[i]) ? source_hw_results[i] - source_sw_results[i] :  source_sw_results[i] - source_hw_results[i];
+		if (difference > ERROR_THRESHOLD) {
 			std::cout << "Error: Result mismatch" << std::endl;
 			std::cout << "i = " << i << " CPU result = " << source_sw_results[i] << " Device result = " << source_hw_results[i] << std::endl;
 			std::cout << "Input causing error: " << source_values[i] << std::endl;
 			match = false;
-			break;
+			//break;
 		}
 	}
 
