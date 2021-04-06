@@ -1,3 +1,5 @@
+## Mergesort
+
 Mergesort is a recursive sorting algorithm that relies on blocks of sorted elements.
 
 The bitonic mergesort is a parellization of the lowest level comparisisons  

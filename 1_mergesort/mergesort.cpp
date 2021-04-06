@@ -49,7 +49,7 @@ void mergesort(	const unsigned int* input,
 	unsigned int intermediate_e[BUFFER_SIZE];
 //#endif
 
-#pragma HLS DATAFLOW
+
 
     	for (int i = 0; i < size; i += BUFFER_SIZE) {
 #pragma HLS LOOP_TRIPCOUNT min = c_len max = c_len

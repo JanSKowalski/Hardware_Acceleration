@@ -21,7 +21,7 @@
 
 //Make sure this information matches the kernel!
 #define DATA_SIZE 4096
-#define KERNEL_PRECISION 4	//2, 4 or 8
+#define KERNEL_PRECISION 8	//2, 4 or 8
 
 //void mergesort(int, int, void*);
 void mergesort(int, int, std::vector<int, aligned_allocator<int>>&);

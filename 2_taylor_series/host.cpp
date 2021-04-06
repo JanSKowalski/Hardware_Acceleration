@@ -15,7 +15,8 @@
 #define WEIGHT_FILE_PATH "src/weights.data"
 
 //Threshold with quantization (14 bits, 3 for whole num)
-#define ERROR_THRESHOLD 0.005
+#define ERROR_THRESHOLD 0.005 //14b threshold
+//#define ERROR_THRESHOLD 0.02 //10b threshold
 
 //Threshold without quantization
 //#define ERROR_THRESHOLD 0.00001
