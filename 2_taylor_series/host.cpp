@@ -7,11 +7,18 @@
 #include <iostream>
 #include <fstream> 
 
+#include "taylor.hpp"
+
 #define PI 3.14159265
 #define DATA_SIZE 4096
 #define NUM_WEIGHTS 4
 #define WEIGHT_FILE_PATH "src/weights.data"
-#define ERROR_THRESHOLD 0.00001
+
+//Threshold with quantization (14 bits, 3 for whole num)
+#define ERROR_THRESHOLD 0.005
+
+//Threshold without quantization
+//#define ERROR_THRESHOLD 0.00001
 
 int main(int argc, char** argv) {
 	if (argc != 2) {
@@ -22,13 +29,15 @@ int main(int argc, char** argv) {
 	//******************* Declare variables ******************************
 
 	std::string binaryFile = argv[1];
-	size_t vector_data_size_bytes = sizeof(double) * DATA_SIZE;
-	size_t vector_weights_size_bytes = sizeof(double) * NUM_WEIGHTS;
+	size_t vector_data_size_bytes = sizeof(qdouble) * DATA_SIZE;
+	size_t vector_weights_size_bytes = sizeof(qdouble) * NUM_WEIGHTS;
 
-	std::vector<double, aligned_allocator<double> > source_values(DATA_SIZE);
-	std::vector<double, aligned_allocator<double> > source_weights(NUM_WEIGHTS);
-	std::vector<double, aligned_allocator<double> > source_hw_results(DATA_SIZE);
-	std::vector<double, aligned_allocator<double> > source_sw_results(DATA_SIZE);
+	std::vector<double, aligned_allocator<double> > initial_values(DATA_SIZE);
+	std::vector<qdouble, aligned_allocator<qdouble> > quantized_values(DATA_SIZE);
+	std::vector<double, aligned_allocator<double> > initial_weights(NUM_WEIGHTS);
+	std::vector<qdouble, aligned_allocator<qdouble> > quantized_weights(NUM_WEIGHTS);
+	std::vector<qdouble, aligned_allocator<qdouble> > source_hw_results(DATA_SIZE);
+	std::vector<qdouble, aligned_allocator<qdouble> > source_sw_results(DATA_SIZE);
 
 	cl_int err;
 	cl::Kernel krnl_taylor;
@@ -46,7 +55,9 @@ int main(int argc, char** argv) {
 	}
 	int i=0;
 	while (getline (weight_file, input_buffer)) {
-		source_weights[i++] = std::stod(input_buffer);
+		initial_weights[i] = std::stod(input_buffer);
+		quantized_weights[i] = (qdouble) initial_weights[i];
+		i++;
 	}
 	weight_file.close(); 
 	
@@ -55,12 +66,13 @@ int main(int argc, char** argv) {
 	//std::generate(source_values.begin(), source_values.end(), std::rand);
 
 	for (int i = 0; i < DATA_SIZE; i++) {
-		source_values[i] = ((double) rand() / (RAND_MAX))*2*PI - PI;
+		initial_values[i] = ((double) rand() / (RAND_MAX))*2*PI - PI;
+		quantized_values[i] = (qdouble) initial_values[i];
 		//w[0] + w[1]x + w[2]x**2 + w[3]x**3
-		double squared = source_values[i]*source_values[i];
-		double cubed = squared*source_values[i];
-		source_sw_results[i] = source_weights[0] + source_weights[1]*source_values[i] + source_weights[2]*squared + source_weights[3]*cubed;
-		source_hw_results[i] = 0;
+		double squared = initial_values[i]*initial_values[i];
+		double cubed = squared*initial_values[i];
+		source_sw_results[i] =  (qdouble) (initial_weights[0] + initial_weights[1]*initial_values[i] + initial_weights[2]*squared + initial_weights[3]*cubed);
+		source_hw_results[i] = (qdouble) 0;
 	}
 
 	//******************* Try to access platform ************************
@@ -92,8 +104,8 @@ int main(int argc, char** argv) {
 
 	//************************  Inteface with kernel ********************
 
-	OCL_CHECK(err, cl::Buffer buffer_input(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, vector_data_size_bytes, source_values.data(), &err));
-	OCL_CHECK(err, cl::Buffer buffer_weights(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, vector_weights_size_bytes, source_weights.data(), &err));
+	OCL_CHECK(err, cl::Buffer buffer_input(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, vector_data_size_bytes, quantized_values.data(), &err));
+	OCL_CHECK(err, cl::Buffer buffer_weights(context, CL_MEM_USE_HOST_PTR | CL_MEM_READ_ONLY, vector_weights_size_bytes, quantized_weights.data(), &err));
 	OCL_CHECK(err, cl::Buffer buffer_output(context, CL_MEM_USE_HOST_PTR | CL_MEM_WRITE_ONLY, vector_data_size_bytes, source_hw_results.data(), &err));
 
 	//send arguments to hls function
@@ -118,21 +130,20 @@ int main(int argc, char** argv) {
 	std::cout << "Checking taylor series approximation"<< std::endl;;
 
 	bool match = true;
-	double approx_error, difference;
-	double actual_sin_value;
+	qdouble approx_error, actual_sin_value, difference;
 	double sum_of_differences = 0;
 	for (int i = 0; i < DATA_SIZE; i++) {
 		//record how well the weights predict sin(x)
-		actual_sin_value = sin(source_values[i]);
+		actual_sin_value = (qdouble) sin(initial_values[i]);
 		approx_error = (source_hw_results[i] > actual_sin_value) ? source_hw_results[i] - actual_sin_value :  actual_sin_value - source_hw_results[i];
-		sum_of_differences += approx_error;
+		sum_of_differences += (double) approx_error;
 		
 		//determine if hardware performed correctly		
 		difference = (source_hw_results[i] > source_sw_results[i]) ? source_hw_results[i] - source_sw_results[i] :  source_sw_results[i] - source_hw_results[i];
 		if (difference > ERROR_THRESHOLD) {
 			std::cout << "Error: Result mismatch" << std::endl;
 			std::cout << "i = " << i << " CPU result = " << source_sw_results[i] << " Device result = " << source_hw_results[i] << std::endl;
-			std::cout << "Input causing error: " << source_values[i] << std::endl;
+			std::cout << "Input causing error: " << quantized_values[i] << std::endl;
 			match = false;
 			//break;
 		}
