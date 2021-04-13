@@ -1,11 +1,13 @@
 ## Autoencoder inference
 
-ONNX is the up-and-coming standard for dealing with ML models. Most popular frameworks support it. Although ehe main ONNX interface is python, the developers included a C/C++ API that we can [hopefully] use in conjunction with the u200 C++ calls.
+Autoencoders are a class of ML models trained to map input to output. They are largely used as placeholders, or as a security measure (see arxiv 1702.something).
 
-Vitis-AI exists, but as of the writing of this md (April 2021) it doesn't officially support xgboost. 
+In this project, we focus on ONNX. ONNX is the up-and-coming standard for handling ML models between applications, and can be accessed with the ONNXRuntime API. Although ONNXRuntime is mainly written for python, the developers included a C/C++ API that we endeavor to use. 
 
-Here we train an autoencoder in export_onnx.py. We then verify that we can read the model with import_onnx.py, and again in standalone_import_onnx.cpp
+As possible alternative, Vitis-AI is built on top of ONNXRuntime for FPGAs. It doesn't support xgboost however (as of April 2021), so we will work directly with ONNXRuntime. 
 
+Train the autoencoder: export_onnx.py  
+Verify onnx model: import_onnx.py, standalone_import_onnx.cpp  
 
 ### Results
 The standalone C ONNX reader works fine. Still working on integrating this into host.c
