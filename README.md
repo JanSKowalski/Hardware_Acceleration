@@ -8,9 +8,9 @@ Xilinx has its own V++ compiler that I use, targeting the u200 platform
 The accelerators are tested with software and hardware emulation, as I do not own a u200  
  <code> make run TARGET=<sw_emu/hw_emu> DEVICE=xilinx_u200_xdma_201830_2 </code>
 
-| In Progress | 3  |
+| In Progress | |
 |------|------|
-| Completed   | 1, 2  |
+| Completed   | 1-3  |
 
 For more details about specifc accelerators, access the readme available in that directory.
 

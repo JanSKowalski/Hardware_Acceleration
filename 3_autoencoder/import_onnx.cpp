@@ -6,7 +6,7 @@
 // https://github.com/microsoft/onnxruntime/blob/master/csharp/test/Microsoft.ML.OnnxRuntime.EndToEndTests.Capi/CXX_Api_Sample.cpp
 
 //To run
-//g++ -L/home/jan/Github_repos/ONNXRuntime/onnxruntime-linux-x64-1.4.0/lib -o standalone_import_onnx.out standalone_import_onnx.cpp -lonnxruntime
+//g++ -L/home/jan/Github_repos/ONNXRuntime/onnxruntime-linux-x64-1.4.0/lib -o import_onnx.out import_onnx.cpp -lonnxruntime
 
 
 // Read in a model in ONNX format, perform inference on it to double check.
