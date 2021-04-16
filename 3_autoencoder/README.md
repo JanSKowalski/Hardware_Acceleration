@@ -6,7 +6,7 @@ In this project we focus on ONNX. ONNX is the up-and-coming standard for handlin
 
 Vitis-AI is a possible alternative. It's an API built on top of ORT for Xilinx FPGAs. It doesn't support xgboost however (as of April 2021), so we work directly with ORT. 
 
-Unfortunately, I (misunderstood)[https://github.com/microsoft/onnxruntime/issues/7350] the purpose of ORT, thinking that the API allowed access to nodes within the ONNX model. As a result I don't believe future projects will use ORT.  
+Unfortunately, I [misunderstood](https://github.com/microsoft/onnxruntime/issues/7350) the purpose of ORT, thinking that the API allowed access to nodes within the ONNX model. As a result I don't believe I will use ORT for future projects.  
 
 Train the autoencoder: export_onnx.py  
 Verify onnx model: import_onnx.py, import_onnx.cpp  
