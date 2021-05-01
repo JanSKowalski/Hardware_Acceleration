@@ -1,12 +1,11 @@
 //Jan S Kowalski 5/1/21
-//Taylor series approx.
+//XGBoost hardware
 
-#define BUFFER_SIZE 1024
-#define DATA_SIZE 1024
+#define BUFFER_SIZE 150
+#define DATA_SIZE 150
 
 const unsigned int c_len = DATA_SIZE / BUFFER_SIZE;
 const unsigned int c_size = BUFFER_SIZE;
-
 
 //input_values and output_values are expected to be of different sizes
 //specifically, four input values (features) for every output
@@ -22,22 +21,14 @@ void xgboost(	const double* input_values,
 		double tree3[BUFFER_SIZE];
 		double vout_buffer[BUFFER_SIZE];
 
-		main_buffer_access:
-    	for (int i = 0; i < size; i += BUFFER_SIZE) {
+		int index;
 
+		read1:
+			for (int j = 0; j < 4*BUFFER_SIZE; j++) {
+#pragma HLS loop_tripcount min=600 max=600
 
-			#pragma HLS LOOP_TRIPCOUNT min = c_len max = c_len
-			int chunk_size = BUFFER_SIZE;
+				vin_buffer[j] = input_values[j];
 
-			if ((i + BUFFER_SIZE) > size) chunk_size = size - i;
-
-			read1:
-			for (int j = 0; j < chunk_size; j++) {
-				#pragma HLS LOOP_TRIPCOUNT min = c_size max = c_size
-				#pragma HLS PIPELINE II = 1 rewind
-				for (int k=0; k < 4; k++){
-					vin_buffer[4*j + k] = input_values[i + 4*j + k];
-				}
 			}
 
 			//software check is a file with expected prediction from this tree
@@ -50,11 +41,9 @@ void xgboost(	const double* input_values,
 			//the first value in a split tuple is the index of the feature being compared
 
 			inference_1:
-			for(int j=0; j < chunk_size; j++){
-				#pragma HLS PIPELINE II = 1
-				#pragma HLS LOOP_TRIPCOUNT min = c_size max = c_size
-				#pragma HLS unroll factor=4
-
+			for(int j=0; j < BUFFER_SIZE; j++){
+#pragma HLS loop_flatten
+#pragma HLS loop_tripcount min=150 max=150
 				//tree 1
 				if (*(vin_buffer + 4*j + (int) weights[0]) < weights[1])
 					tree1[j] = weights[10];
@@ -97,11 +86,9 @@ void xgboost(	const double* input_values,
 
 			// burst write the result
 			write:
-			for (int j = 0; j < chunk_size; j++) {
-				#pragma HLS LOOP_TRIPCOUNT min = c_size max = c_size
-				#pragma HLS PIPELINE II = 1 rewind
-				output_values[i + j] = vout_buffer[j];
+			for (int j = 0; j < BUFFER_SIZE; j++) {
+#pragma HLS loop_tripcount min=150 max=150
+				output_values[j] = vout_buffer[j];
 			}
 		}
-	}
 }
