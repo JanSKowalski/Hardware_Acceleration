@@ -6,14 +6,14 @@ import hw_strings
 def export_inputs_and_outputs(inputs, model_prediction):
 
 	#write out model inputs
-	f = open("inputs.data", "w")
+	f = open("data/inputs.data", "w")
 	for data in inputs:
 		line = str(data)+'\n'
 		f.write(line)
 	f.close()
 
 	#write out expected predictions
-	f = open("expected_results.data", "w")
+	f = open("data/expected_outputs.data", "w")
 	for result in model_prediction:
 		line = str(result)+'\n'
 		f.write(line)
@@ -31,7 +31,7 @@ def generate_classification_hardware(model):
 	
 	#Open file
 	try:
-		hw_file = open("test_hardware.cpp", "w")
+		hw_file = open("xgboost.cpp", "w")
 	except IOError as exception:
 		raise RuntimeError('Failed to open hardware file') from exception
 	
@@ -52,7 +52,7 @@ def generate_classification_hardware(model):
 	
 
 	#Extract structure info from model
-	intermediate_file = 'xgb_model.txt'
+	intermediate_file = 'data/xgb_model.txt'
 	model.get_booster().dump_model(intermediate_file, with_stats=True)
 	try:
 		xgb_model = open(intermediate_file, 'r') 
@@ -99,7 +99,7 @@ def generate_classification_hardware(model):
 			continue
 		#write splits
 		if(re.search("gain", line)):
-			split = hw_strings.tree_structure
+			split = hw_strings.split
 			split = split.replace("^num_features^", str(model.n_features_in_))
 			split = split.replace("^a^", str(weight_values[weight_index]))
 			weight_index += 1
@@ -148,6 +148,17 @@ def generate_classification_hardware(model):
 
 
 	hw_file.write(tree)
+	
+	#For classification models, find the largest probability and return that class
+	hw_file.write("\n\n\tdouble max_value = 0.0;\n")
+	prediction = "	^class_logic^"
+	for index in range(0,model.n_classes_):
+		logic = hw_strings.classification_logic
+		logic = logic.replace("^index^", str(index))
+		prediction = prediction.replace("^class_logic^", logic)
+	prediction = prediction.replace("^class_logic^", "")
+	hw_file.write(prediction)
+	
 	hw_file.write(hw_strings.write_out)
 	
 	hw_file.close()
