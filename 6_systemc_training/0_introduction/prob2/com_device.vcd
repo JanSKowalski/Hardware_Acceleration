@@ -1,0 +1,255 @@
+$date
+     Sep 05, 2021       20:44:00
+$end
+
+$version
+ SystemC 2.3.3-Accellera --- Sep  4 2021 15:36:11
+$end
+
+$timescale
+     1 ps
+$end
+
+$scope module SystemC $end
+$var wire    1  aaaaa  t_clock       $end
+$var wire    1  aaaab  t_reset       $end
+$var wire    1  aaaac  t_clear       $end
+$var wire   12  aaaad  t_data_in [11:0]  $end
+$var wire    4  aaaae  t_payload [3:0]  $end
+$var wire    8  aaaaf  t_count [7:0]  $end
+$var wire    8  aaaag  t_error [7:0]  $end
+$upscope $end
+$enddefinitions  $end
+
+$comment
+All initial values are dumped below at time 0 sec = 0 timescale units.
+$end
+
+$dumpvars
+1aaaaa
+0aaaab
+0aaaac
+b0 aaaad
+b0 aaaae
+b0 aaaaf
+b0 aaaag
+$end
+
+#2500
+0aaaaa
+
+#7000
+1aaaab
+b101010000 aaaad
+
+#7500
+1aaaaa
+b101 aaaae
+b1 aaaaf
+b1 aaaag
+
+#12500
+0aaaaa
+
+#17000
+b110110001 aaaad
+
+#17500
+1aaaaa
+b1011 aaaae
+b10 aaaaf
+b10 aaaag
+
+#22500
+0aaaaa
+
+#27000
+b11000000 aaaad
+
+#27500
+1aaaaa
+
+#32500
+0aaaaa
+
+#37000
+b100000001 aaaad
+
+#37500
+1aaaaa
+b0 aaaae
+b11 aaaaf
+
+#42500
+0aaaaa
+
+#47000
+b111000001 aaaad
+
+#47500
+1aaaaa
+b1100 aaaae
+b100 aaaaf
+
+#52500
+0aaaaa
+
+#57000
+b110010000 aaaad
+
+#57500
+1aaaaa
+b1001 aaaae
+b101 aaaaf
+b11 aaaag
+
+#62500
+0aaaaa
+
+#67000
+b100110000 aaaad
+
+#67500
+1aaaaa
+b11 aaaae
+b110 aaaaf
+b100 aaaag
+
+#72500
+0aaaaa
+
+#77500
+1aaaaa
+b111 aaaaf
+b101 aaaag
+
+#82500
+0aaaaa
+
+#87000
+b100100000 aaaad
+
+#87500
+1aaaaa
+b10 aaaae
+b1000 aaaaf
+
+#92500
+0aaaaa
+
+#97000
+b101010000 aaaad
+
+#97500
+1aaaaa
+b101 aaaae
+b1001 aaaaf
+b110 aaaag
+
+#102500
+0aaaaa
+
+#107000
+b100000000 aaaad
+
+#107500
+1aaaaa
+b0 aaaae
+b1010 aaaaf
+b111 aaaag
+
+#112500
+0aaaaa
+
+#117000
+1aaaac
+b111110001 aaaad
+b0 aaaaf
+b0 aaaag
+
+#117500
+1aaaaa
+
+#122500
+0aaaaa
+
+#127000
+b10010000 aaaad
+
+#127500
+1aaaaa
+
+#132500
+0aaaaa
+
+#137000
+b100001 aaaad
+
+#137500
+1aaaaa
+
+#142500
+0aaaaa
+
+#147000
+0aaaac
+b101110000 aaaad
+
+#147500
+1aaaaa
+b111 aaaae
+b1011 aaaaf
+b111 aaaag
+
+#152500
+0aaaaa
+
+#157000
+b10100000 aaaad
+
+#157500
+1aaaaa
+
+#162500
+0aaaaa
+
+#167000
+b1000000 aaaad
+
+#167500
+1aaaaa
+
+#172500
+0aaaaa
+
+#177000
+b110000000 aaaad
+
+#177500
+1aaaaa
+b1000 aaaae
+b1100 aaaaf
+
+#182500
+0aaaaa
+
+#187000
+b110100000 aaaad
+
+#187500
+1aaaaa
+b1010 aaaae
+b1101 aaaaf
+b1000 aaaag
+
+#192500
+0aaaaa
+
+#197000
+b110100001 aaaad
+
+#197500
+1aaaaa
+b1110 aaaaf
+
+#200000
